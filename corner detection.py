@@ -4,6 +4,7 @@ Created on Thu Aug 31 18:41:24 2023
 
 @author: USER
 """
+bg = None
 def proccess(img):
 # make image grey
     img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -14,27 +15,41 @@ def showsubtraction(img1,img2):
     
     img1 = proccess(img1)
     img2 = proccess(img2)
-    cv.imshow("img1",img1)
-    cv.imshow("img2",img2)
     subtracted = cv.subtract(img2, img1)
-    cv.imshow("subtracted",subtracted)
-    
 # Canny Edge Detection
     edges = cv.Canny(image=subtracted, threshold1=50, threshold2=50) # Canny Edge Detection
     
 # Display Canny Edge Detection Image
     cv.imshow('Canny Edge Detection', edges)
-    cv.waitKey(0)
 
+    # find Harris corners
+    gray = np.float32(edges)
+    dst = cv.cornerHarris(gray,2,3,0.04)
+    dst = cv.dilate(dst,None)
+    ret, dst = cv.threshold(dst,0.01*dst.max(),255,0)
+    dst = np.uint8(dst)
+
+    # find centroids
+    ret, labels, stats, centroids = cv.connectedComponentsWithStats(dst)
+
+    # define the criteria to stop and refine the corners
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 100, 0.001)
+    corners = cv.cornerSubPix(gray,np.float32(centroids),(5,5),(-1,-1),criteria)
+
+    # Now draw them
+    res = np.hstack((centroids,corners))
+    res = np.int0(res)
+    edges[res[:,1],res[:,0]]=[0,0,255]
+    edges[res[:,3],res[:,2]] = [0,255,0]
+    cv.imshow("corners",edges)
+
+    
 import cv2 as cv
-img1 = None
-img2 = None
-  
+import numpy as np
 capture = cv.VideoCapture(0)
 
 while True:
     isTrue,frame = capture.read()
-    
     
     
     cv.imshow('Video',frame)
@@ -45,20 +60,11 @@ while True:
         break
     
     if t & 0xFF==ord(' '):
-        if img2 is None:
-            if img1 is not None:
-                img2 = frame
-                print("img2 is set")
-                capture.release()
-                cv.destroyAllWindows()
-                showsubtraction(img1, img2)
-        if img1 is None:
-            img1 = frame
+        if bg is None:
+            bg = frame
             print("img1 is set")
-        if img1 is None :
-            img1 = frame
-            print("img1 is set")
-        
+    if bg is not None:
+        showsubtraction(frame, bg)
 
 cv.destroyAllWindows() 
 
