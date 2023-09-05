@@ -20,11 +20,9 @@ def showsubtraction(img1,img2):
     edges = cv.Canny(image=subtracted, threshold1=50, threshold2=50) # Canny Edge Detection
     
 # Display Canny Edge Detection Image
-    cv.imshow('Canny Edge Detection', edges)
-
     # find Harris corners
     gray = np.float32(edges)
-    dst = cv.cornerHarris(gray,2,3,0.04)
+    dst = cv.cornerHarris(gray,2,3,0.1)
     dst = cv.dilate(dst,None)
     ret, dst = cv.threshold(dst,0.01*dst.max(),255,0)
     dst = np.uint8(dst)
@@ -39,8 +37,11 @@ def showsubtraction(img1,img2):
     # Now draw them
     res = np.hstack((centroids,corners))
     res = np.int0(res)
+    
+    edges = cv.cvtColor(edges,cv.COLOR_GRAY2RGB)
+
     edges[res[:,1],res[:,0]]=[0,0,255]
-    edges[res[:,3],res[:,2]] = [0,255,0]
+    edges[res[:,3],res[:,2]] = [0,0,255]
     cv.imshow("corners",edges)
 
     
@@ -67,5 +68,4 @@ while True:
         showsubtraction(frame, bg)
 
 cv.destroyAllWindows() 
-
 
