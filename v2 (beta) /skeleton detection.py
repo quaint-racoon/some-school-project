@@ -8,12 +8,23 @@ Created on Sun Sep 10 17:21:24 2023
 # To use Inference Engine backend, specify location of plugins:
 # export LD_LIBRARY_PATH=/opt/intel/deeplearning_deploymenttoolkit/deployment_tools/external/mklml_lnx/lib:$LD_LIBRARY_PATH
 import cv2 as cv
-from numpy import arctan,pi
+from numpy import arctan,pi,mean
 import argparse
-
+angles = []
 def findangle(a,b):
     if (b[0] - a[0]) == 0: return
-    return (arctan((b[1] - a[1]) / (b[0] - a[0]))* (180.0 / pi))
+    c = (arctan((b[1] - a[1]) / (b[0] - a[0]))* (180.0 / pi))
+    angles.append(c)
+    return c + "\n" +findscoliosis(findavg())
+def findscoliosis(a):
+    if 0 < a < 10:
+        return "normal"
+    if 25 < a < 30:
+        return "significant intermediate scoliosis"
+    if 50 < a < 45:
+        return "severe scoliosis"
+def findavg():
+    return mean(angles)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', help='Path to image or video. Skip to capture frames from camera')
