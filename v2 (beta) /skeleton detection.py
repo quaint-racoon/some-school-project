@@ -13,17 +13,21 @@ import argparse
 angles = []
 def findangle(a,b):
     if (b[0] - a[0]) == 0: return
-    c = (arctan((b[1] - a[1]) / (b[0] - a[0]))* (180.0 / pi))
+    c = abs((arctan((b[1] - a[1]) / (b[0] - a[0]))* (180.0 / pi)))
     angles.append(c)
-    return c + "\n" +findscoliosis(findavg())
+    return str(c) + "\n" +findscoliosis(findavg())
 def findscoliosis(a):
-    if 0 < a < 10:
+    #a=abs(a)
+    if 0 <= a < 10:
         return "normal"
-    if 25 < a < 30:
+    if 10 <= a < 25:
         return "significant intermediate scoliosis"
-    if 50 < a < 45:
+    if  a >= 25:
         return "severe scoliosis"
+    #return "null"
 def findavg():
+    #print(mean(angles))
+    
     return mean(angles)
 
 parser = argparse.ArgumentParser()
@@ -46,7 +50,11 @@ inHeight = args.height
 
 net = cv.dnn.readNetFromTensorflow("graph_opt.pb")
 
-cap = cv.VideoCapture(args.input if args.input else 0)
+cap = cv.VideoCapture(0)#args.input if args.input else 0)
+#hasFrame, frame = cap.read()
+#cv.imshow("frame1",frame)
+#cv.waitKey(0)
+#cv.destroyAllWindows()
 
 while cv.waitKey(1) < 0:
     hasFrame, frame = cap.read()
