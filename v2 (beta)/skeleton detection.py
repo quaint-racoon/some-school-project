@@ -4,30 +4,29 @@ Created on Sun Sep 10 17:21:24 2023
 
 @author: USER
 """
-
 # To use Inference Engine backend, specify location of plugins:
 # export LD_LIBRARY_PATH=/opt/intel/deeplearning_deploymenttoolkit/deployment_tools/external/mklml_lnx/lib:$LD_LIBRARY_PATH
 import cv2 as cv
-from numpy import arctan,pi,mean
+from numpy import arctan,pi,mean,round
 import argparse
 angles = []
+startedaverage = False
 def findangle(a,b):
     if (b[0] - a[0]) == 0: return
     c = abs((arctan((b[1] - a[1]) / (b[0] - a[0]))* (180.0 / pi)))
     angles.append(c)
-    return str(c) + "\n" +findscoliosis(findavg())
+    if(startedaverage==False): return "angle : "+ str(round(c, decimals = 2)) + " not calculating average"
+    d = findavg()
+    return "angle: "+str(round(c, decimals = 2)) + " case: " +findscoliosis(d) + " average: "+ str(round(d, decimals = 2))
 def findscoliosis(a):
-    #a=abs(a)
     if 0 <= a < 10:
         return "normal"
-    if 10 <= a < 25:
+    if 10 <= a < 20:
         return "significant intermediate scoliosis"
-    if  a >= 25:
+    if 20 < a :
         return "severe scoliosis"
-    #return "null"
-def findavg():
-    #print(mean(angles))
     
+def findavg():
     return mean(angles)
 
 parser = argparse.ArgumentParser()
@@ -50,13 +49,9 @@ inHeight = args.height
 
 net = cv.dnn.readNetFromTensorflow("graph_opt.pb")
 
-cap = cv.VideoCapture(0)#args.input if args.input else 0)
-#hasFrame, frame = cap.read()
-#cv.imshow("frame1",frame)
-#cv.waitKey(0)
-#cv.destroyAllWindows()
+cap = cv.VideoCapture(args.input if args.input else 0)
 
-while cv.waitKey(1) < 0:
+while True:
     hasFrame, frame = cap.read()
     if not hasFrame:
         cv.waitKey()
@@ -95,7 +90,7 @@ while cv.waitKey(1) < 0:
         idTo = BODY_PARTS[partTo]
         
         if points[idFrom] and points[idTo]:
-            
+            # print(findangle(points[idFrom], points[idTo]))
             cv.line(frame, points[idFrom], points[idTo], (0, 255, 0), 3)
             cv.ellipse(frame, points[idFrom], (3, 3), 0, 0, 360, (0, 0, 255), cv.FILLED)
             cv.ellipse(frame, points[idTo], (3, 3), 0, 0, 360, (0, 0, 255), cv.FILLED)
@@ -103,6 +98,9 @@ while cv.waitKey(1) < 0:
     t, _ = net.getPerfProfile()
     freq = cv.getTickFrequency() / 1000
     cv.putText(frame, '%.2fms' % (t / freq), (10, 20), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
+    btn = cv.waitKey(1)
+    if(btn & 0xFF==ord('q')): break
+    if(btn & 0xFF==ord(' ')): startedaverage = True
     
     cv.imshow('OpenPose using OpenCV', frame)
 cap.release()
