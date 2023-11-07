@@ -19,11 +19,11 @@ def findangle(a,b):
     d = findavg()
     return "angle: "+str(round(c, decimals = 2)) + " case: " +findscoliosis(d) + " average: "+ str(round(d, decimals = 2))
 def findscoliosis(a):
-    if 0 <= a < 10:
+    if 0 <= a <= 10:
         return "normal"
-    if 10 <= a < 20:
+    if 11 <= a <= 24:
         return "significant intermediate scoliosis"
-    if 20 < a :
+    if 25 <= a :
         return "severe scoliosis"
     
 def findavg():
