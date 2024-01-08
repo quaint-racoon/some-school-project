@@ -15,13 +15,13 @@ def findangle(a,b):
     if (b[0] - a[0]) == 0: return
     c = abs((arctan((b[1] - a[1]) / (b[0] - a[0]))* (180.0 / pi)))
     angles.append(c)
-    if(startedaverage==False): return "angle : "+ str(round(c, decimals = 2)) + " not calculating average"
+    if(startedaverage==False): return "angle : "+ str(round(c, decimals = 2)) + " || not calculating average"
     d = findavg()
-    return "angle: "+str(round(c, decimals = 2)) + " case: " +findscoliosis(d) + " average: "+ str(round(d, decimals = 2))
+    return "angle: "+str(round(c, decimals = 2)) + " || angle case: " +findscoliosis(c) + " || average: "+ str(round(d, decimals = 2))+" || average case:"+findscoliosis(d)
 def findscoliosis(a):
     if 0 <= a <= 10:
         return "normal"
-    if 11 <= a <= 24:
+    if 10 <= a <= 25:
         return "significant intermediate scoliosis"
     if 25 <= a :
         return "severe scoliosis"
@@ -88,20 +88,21 @@ while True:
 
         idFrom = BODY_PARTS[partFrom]
         idTo = BODY_PARTS[partTo]
+        cv.rectangle(frame, (0,0), (frame.shape[1],50), (0,0,0), -1)
         
         if points[idFrom] and points[idTo]:
             # print(findangle(points[idFrom], points[idTo]))
             cv.line(frame, points[idFrom], points[idTo], (0, 255, 0), 3)
             cv.ellipse(frame, points[idFrom], (3, 3), 0, 0, 360, (0, 0, 255), cv.FILLED)
             cv.ellipse(frame, points[idTo], (3, 3), 0, 0, 360, (0, 0, 255), cv.FILLED)
-            cv.putText(frame, str(findangle(points[idFrom], points[idTo])), (10, 40), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
+            cv.putText(frame, str(findangle(points[idFrom], points[idTo])), (10, 40), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
     t, _ = net.getPerfProfile()
     freq = cv.getTickFrequency() / 1000
-    cv.putText(frame, '%.2fms' % (t / freq), (10, 20), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
+    cv.putText(frame, '%.2fms' % (t / freq), (10, 20), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
     btn = cv.waitKey(1)
     if(btn & 0xFF==ord('q')): break
     if(btn & 0xFF==ord(' ')): startedaverage = True
     
-    cv.imshow('OpenPose using OpenCV', frame)
+    cv.imshow('testing frame', frame)
 cap.release()
 cv.destroyAllWindows()
