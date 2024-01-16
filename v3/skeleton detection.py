@@ -35,17 +35,12 @@ def nearestwhiteedge(a,b,edges):
     right = edges[(b[1]-50):b[1], b[0]:(b[0]+50)]
     
     for i in range(49, -1, -1):
+        if((left is None) and (right is None)): break
         if(left is not None): 
-            cv.imshow("left",left)
             if(left[i,i]==255): points[idTo]=(a[0]+(i-49),a[1]+(i-49)) ; left = None
-            else:left[i,i]=255
            
         if(right is not None): 
-            cv.imshow("right",right)
             if(right[i,(49-i)]==255): points[idFrom]=(b[0]+(49-i),b[1]+(i-49));  right = None
-            
-        
-    print(left,right)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', help='Path to image or video. Skip to capture frames from camera')
@@ -75,11 +70,8 @@ while True:
         cv.waitKey()
         break
     edges = cv.Canny(frame,100,200) #canney edge detecton
-    
-    cv.imshow('Edges in the image', edges)
     frameWidth = frame.shape[1]
     frameHeight = frame.shape[0]
-    
     net.setInput(cv.dnn.blobFromImage(frame, 1.0, (inWidth, inHeight), (127.5, 127.5, 127.5), swapRB=True, crop=False))
     out = net.forward()
     out = out[:, :19, :, :]  # MobileNet output [1, 57, -1, -1], we only need the first 19 elements
@@ -123,7 +115,7 @@ while True:
     btn = cv.waitKey(1)
     if(btn & 0xFF==ord('q')): break
     if(btn & 0xFF==ord(' ')): startedaverage = True
-    
+    cv.imshow('Edges in the image', edges)
     cv.imshow('testing frame', frame)
 cap.release()
 cv.destroyAllWindows()
