@@ -30,15 +30,22 @@ def findavg():
     return mean(angles)
 
 def nearestwhiteedge(a,b,edges):
-    print("before:",a,b)
-    a2 = edges[(a[1]-50):a[1], (a[0]-50):a[0]]
-    b2 = edges[(b[1]-50):b[1], b[0]:(b[0]+50)]
-    for i in range(49, 1, -1):
-        if(a2 is not None): 
-            if(a2[i,i]==255): points[idTo]=(a[1]+i,a[0]+i) ; a2 = None
-        if(b2 is not None): 
-            if(b2[i,i]==255): points[idFrom]=(b[1]-i,b[0]+i);  b2 = None
-    print("after:",points[idTo],points[idFrom])
+    
+    left = edges[(a[1]-50):a[1], (a[0]-50):a[0]]
+    right = edges[(b[1]-50):b[1], b[0]:(b[0]+50)]
+    
+    for i in range(49, -1, -1):
+        if(left is not None): 
+            cv.imshow("left",left)
+            if(left[i,i]==255): points[idTo]=(a[0]+(i-49),a[1]+(i-49)) ; left = None
+            else:left[i,i]=255
+           
+        if(right is not None): 
+            cv.imshow("right",right)
+            if(right[i,(49-i)]==255): points[idFrom]=(b[0]+(49-i),b[1]+(i-49));  right = None
+            
+        
+    print(left,right)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', help='Path to image or video. Skip to capture frames from camera')
