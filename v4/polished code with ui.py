@@ -196,23 +196,24 @@ def close_app(event):
 
 root = tk.Tk()
 
+root.configure(background="#d8add0")
 root.title("Angle Measurement")
 root.bind("<Key-q>", close_app)
 
 frame = tk.Frame(root)
 frame.pack(padx=10, pady=10)
 
-canvas = tk.Canvas(root, width=800, height=600)
+canvas = tk.Canvas(root, width=800, height=600,background="#e8dfee")
 canvas.pack()
 canvas.bind("<Button-1>", mouse_click)
 
-label = tk.Label(root, text="")
+label = tk.Label(root, text="",background="#d8add0",font=("",15))
 label.pack()
 
-btn_image = tk.Button(frame, text="Select Image", command=load_image)
+btn_image = tk.Button(frame, text="Select Image", command=load_image,background="#fcf9ce")
 btn_image.pack(side=tk.LEFT, padx=5)
 
-btn_camera = tk.Button(frame, text="Open Live Camera", command=live_camera)
+btn_camera = tk.Button(frame, text="Open Live Camera", command=live_camera,background="#fcf9ce")
 btn_camera.pack(side=tk.LEFT, padx=5)
 
 root.mainloop()
